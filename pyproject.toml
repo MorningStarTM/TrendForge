@@ -1,0 +1,13 @@
+[tool.uv.workspace]
+members = ["backend", "workers"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+
+[tool.mypy]
+python_version = "3.12"
+ignore_missing_imports = true

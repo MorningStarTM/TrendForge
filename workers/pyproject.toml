@@ -1,0 +1,26 @@
+[project]
+name = "trendforge-workers"
+version = "0.1.0"
+description = "TrendForge Celery workers — scraping, generation, publishing, and analytics tasks"
+requires-python = ">=3.12"
+dependencies = [
+    "trendforge-backend",
+    "celery[redis]>=5.4",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "ruff>=0.7",
+    "mypy>=1.13",
+]
+
+[tool.uv.sources]
+trendforge-backend = { workspace = true }
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
