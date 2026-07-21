@@ -20,6 +20,13 @@ services:
     ports:
       - "6379:6379"
 
+  # Ingestion (scraping) and the Data Pool it feeds run in-process inside
+  # `backend`, not as separate Celery worker/beat services — the Data Pool
+  # is an in-memory, single-process store (see
+  # backend/app/services/ingestion/data_pool.py), so a separate worker
+  # process couldn't see it anyway. Redis stays available for a future
+  # Celery use (e.g. image generation, publishing) if that turns out to
+  # need a task queue.
   backend:
     build:
       context: .
@@ -31,28 +38,6 @@ services:
       - redis
     ports:
       - "8000:8000"
-
-  worker:
-    build:
-      context: .
-      dockerfile: workers/Dockerfile
-    restart: unless-stopped
-    env_file: .env
-    command: ["uv", "run", "celery", "-A", "app.celery_app", "worker", "--loglevel=info"]
-    depends_on:
-      - postgres
-      - redis
-
-  beat:
-    build:
-      context: .
-      dockerfile: workers/Dockerfile
-    restart: unless-stopped
-    env_file: .env
-    command: ["uv", "run", "celery", "-A", "app.celery_app", "beat", "--loglevel=info"]
-    depends_on:
-      - postgres
-      - redis
 
   frontend:
     build:

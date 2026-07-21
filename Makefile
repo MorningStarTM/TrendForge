@@ -1,4 +1,4 @@
-.PHONY: up down logs build migrate revision shell-backend shell-worker
+.PHONY: up down logs build migrate revision shell-backend
 
 up:
 	docker compose up -d
@@ -20,6 +20,3 @@ revision:
 
 shell-backend:
 	docker compose exec backend /bin/bash
-
-shell-worker:
-	docker compose exec worker /bin/bash
