@@ -42,6 +42,7 @@ class RawPost(BaseModel):
     audio_id: str | None = None
     geo: Geo | None = None
     author_follower_count: int | None = None
+    engagement_rate: float = 0.0
     posted_at: datetime
     scraped_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     source_query: str | None = None
@@ -53,11 +54,3 @@ class RawPost(BaseModel):
             digest_input = f"{self.text}|{self.media_url or ''}".encode()
             self.content_hash = hashlib.sha256(digest_input).hexdigest()
         return self
-
-    def engagement_rate(self) -> float:
-        """(likes + comments + shares) / max(views, follower_count) — architecture doc 2.4."""
-        denominator = max(self.engagement.views, self.author_follower_count or 0)
-        if denominator == 0:
-            return 0.0
-        numerator = self.engagement.likes + self.engagement.comments + self.engagement.shares
-        return numerator / denominator

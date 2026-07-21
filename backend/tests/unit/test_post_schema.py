@@ -43,25 +43,13 @@ def test_missing_required_fields_raise_validation_error() -> None:
         RawPost.model_validate({"platform": "tiktok"})
 
 
-def test_engagement_rate_uses_views_when_larger_than_follower_count() -> None:
-    post = make_post(
-        engagement=EngagementStats(likes=100, comments=20, shares=10, views=1000),
-        author_follower_count=50,
-    )
+def test_engagement_rate_defaults_to_zero_until_normalizer_sets_it() -> None:
+    post = make_post(engagement=EngagementStats(likes=100, views=1000))
 
-    assert post.engagement_rate() == pytest.approx(130 / 1000)
+    assert post.engagement_rate == 0.0
 
 
-def test_engagement_rate_falls_back_to_follower_count_when_views_are_zero() -> None:
-    post = make_post(
-        engagement=EngagementStats(likes=50, comments=0, shares=0, views=0),
-        author_follower_count=500,
-    )
+def test_engagement_rate_can_be_set_explicitly() -> None:
+    post = make_post(engagement_rate=0.13)
 
-    assert post.engagement_rate() == pytest.approx(50 / 500)
-
-
-def test_engagement_rate_is_zero_when_no_denominator_available() -> None:
-    post = make_post(engagement=EngagementStats(likes=5))
-
-    assert post.engagement_rate() == 0.0
+    assert post.engagement_rate == 0.13
