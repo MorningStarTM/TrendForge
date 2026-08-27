@@ -1,14 +1,25 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "CaptionVariant",
+  "title": "CaptionGenerationOutput",
   "type": "object",
   "properties": {
-    "caption": { "type": "string" },
-    "hashtags": { "type": "array", "items": { "type": "string" } },
-    "cta": { "type": "string" },
-    "language": { "type": "string", "enum": ["ar", "en", "bilingual"] },
-    "market": { "type": "string", "enum": ["KSA", "UAE", "BOTH"] },
-    "tone": { "type": "string", "enum": ["playful", "witty", "bold", "informative"] }
+    "variants": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "properties": {
+          "caption": { "type": "string" },
+          "hashtags": { "type": "array", "items": { "type": "string" } },
+          "cta": { "type": "string" },
+          "language": { "type": "string", "enum": ["ar", "en", "bilingual"] },
+          "market": { "type": "string", "enum": ["KSA", "UAE", "BOTH"] },
+          "tone": { "type": "string", "enum": ["playful", "witty", "bold", "informative"] }
+        },
+        "required": ["caption", "hashtags", "cta", "language", "market", "tone"]
+      }
+    }
   },
-  "required": ["caption", "hashtags", "cta", "language", "market", "tone"]
+  "required": ["variants"]
 }

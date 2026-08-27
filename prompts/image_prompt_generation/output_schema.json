@@ -1,13 +1,23 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "ImagePrompt",
+  "title": "ImagePromptGenerationOutput",
   "type": "object",
   "properties": {
-    "positive_prompt": { "type": "string" },
-    "negative_prompt": { "type": "string" },
-    "aspect_ratio": { "type": "string", "enum": ["1:1", "9:16", "16:9", "4:5"] },
-    "style_reference": { "type": "string" },
-    "text_overlay": { "type": "string" }
+    "image_prompts": {
+      "type": "array",
+      "description": "One image prompt per caption, in the same order as the captions.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "positive_prompt": { "type": "string" },
+          "negative_prompt": { "type": "string" },
+          "aspect_ratio": { "type": "string", "enum": ["1:1", "9:16", "16:9", "4:5"] },
+          "style_reference": { "type": ["string", "null"] },
+          "text_overlay": { "type": ["string", "null"] }
+        },
+        "required": ["positive_prompt", "negative_prompt", "aspect_ratio"]
+      }
+    }
   },
-  "required": ["positive_prompt", "negative_prompt", "aspect_ratio"]
+  "required": ["image_prompts"]
 }
