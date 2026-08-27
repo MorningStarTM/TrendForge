@@ -149,6 +149,7 @@ activemq-data/
 
 # Environments
 .env
+.env.example
 .envrc
 .venv
 env/
@@ -226,6 +227,7 @@ node_modules/
 out/
 next-env.d.ts
 .vercel
+*.tsbuildinfo
 
 # uv
 .venv/
