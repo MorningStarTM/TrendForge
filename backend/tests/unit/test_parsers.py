@@ -15,6 +15,7 @@ def test_parse_instagram_post_extracts_expected_fields() -> None:
         "shortcode": "abc123",
         "caption": "Check this out #pizza #yum",
         "display_url": "https://example.com/img.jpg",
+        "thumbnail_src": "https://example.com/thumb.jpg",
         "is_video": False,
         "like_count": 100,
         "comment_count": 10,
@@ -33,6 +34,7 @@ def test_parse_instagram_post_extracts_expected_fields() -> None:
     assert post.author_follower_count == 5000
     assert post.posted_at.year == 2026
     assert post.source_query == "hashtag:pizza"
+    assert post.thumbnail_url == "https://example.com/thumb.jpg"
 
 
 def test_parse_instagram_post_raises_on_missing_id_and_shortcode() -> None:
@@ -56,6 +58,7 @@ def test_parse_tiktok_post_extracts_expected_fields() -> None:
         "author": {"follower_count": 20000},
         "create_time_utc": "2026-07-01T10:00:00Z",
         "url": "https://tiktok.com/video/123456",
+        "video": {"cover": {"url_list": ["https://tiktokcdn.com/cover.jpg"]}},
     }
 
     post = parse_tiktok_post(raw, source_query="hashtag:comedy")
@@ -68,6 +71,32 @@ def test_parse_tiktok_post_extracts_expected_fields() -> None:
     assert post.engagement.saves == 5
     assert post.author_follower_count == 20000
     assert post.posted_at.year == 2026
+    assert post.thumbnail_url == "https://tiktokcdn.com/cover.jpg"
+    assert post.media_type == "video"  # plain video -> not static
+
+
+def test_parse_tiktok_post_thumbnail_is_none_when_no_cover() -> None:
+    raw = {"aweme_id": "1", "desc": "no video obj"}
+
+    post = parse_tiktok_post(raw, source_query="hashtag:x")
+
+    assert post.thumbnail_url is None
+
+
+def test_parse_tiktok_photo_post_is_static_image() -> None:
+    # A TikTok photo post (slideshow) carries image data -> treated as static.
+    raw = {
+        "aweme_id": "9",
+        "desc": "my outfit #ootd",
+        "image_post_info": {
+            "images": [{"display_image": {"url_list": ["https://tiktokcdn.com/photo1.jpg"]}}]
+        },
+    }
+
+    post = parse_tiktok_post(raw, source_query="hashtag:ootd")
+
+    assert post.media_type == "image"
+    assert post.thumbnail_url == "https://tiktokcdn.com/photo1.jpg"
 
 
 def test_parse_tiktok_post_raises_on_missing_aweme_id() -> None:
@@ -84,6 +113,7 @@ def test_parse_youtube_post_handles_search_shape_with_published_time() -> None:
         "viewCountInt": 5000,
         "publishedTime": "2026-07-01T08:00:00.000Z",
         "url": "https://youtube.com/watch?v=abc123",
+        "thumbnail": "https://i.ytimg.com/vi/abc123/hq720.jpg",
     }
 
     post = parse_youtube_post(raw, source_query="keyword:pizza")
@@ -91,6 +121,7 @@ def test_parse_youtube_post_handles_search_shape_with_published_time() -> None:
     assert post.platform_post_id == "abc123"
     assert post.engagement.views == 5000
     assert post.posted_at.year == 2026
+    assert post.thumbnail_url == "https://i.ytimg.com/vi/abc123/hq720.jpg"
 
 
 def test_parse_youtube_post_handles_trending_shape_with_publish_date() -> None:

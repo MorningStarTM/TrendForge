@@ -36,10 +36,12 @@ class RawPost(BaseModel):
     text: str = ""
     language: str | None = None
     media_url: str | None = None
+    thumbnail_url: str | None = None
     media_type: MediaType | None = None
     engagement: EngagementStats = Field(default_factory=EngagementStats)
     hashtags: list[str] = Field(default_factory=list)
     audio_id: str | None = None
+    audio_title: str | None = None  # human-readable song/sound name (for content gen)
     geo: Geo | None = None
     author_follower_count: int | None = None
     engagement_rate: float = 0.0

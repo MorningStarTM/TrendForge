@@ -21,6 +21,27 @@ def make_instagram_raw(post_id: str, caption: str = "post #pizza") -> dict[str, 
 
 
 @pytest.mark.asyncio
+async def test_media_type_filter_drops_videos_keeps_static() -> None:
+    pool = DataPool()
+    photo = make_instagram_raw("1", caption="a photo #pizza")  # is_video False -> image
+    video = {**make_instagram_raw("2", caption="a reel #pizza"), "is_video": True}
+
+    summary = await normalize_and_ingest(
+        "instagram",
+        [photo, video],
+        source_query="hashtag:pizza",
+        pool=pool,
+        allowed_media_types={"image", "carousel"},
+    )
+
+    assert summary.received == 2
+    assert summary.filtered_media == 1  # the video was filtered out
+    assert summary.added_to_pool == 1
+    assert pool.size == 1
+    assert pool.all_posts()[0].media_type == "image"
+
+
+@pytest.mark.asyncio
 async def test_valid_records_are_normalized_and_added_to_the_pool() -> None:
     pool = DataPool()
     dead_letters = DeadLetterQueue()

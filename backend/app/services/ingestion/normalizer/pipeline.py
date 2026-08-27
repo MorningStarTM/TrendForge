@@ -9,7 +9,7 @@ from app.services.ingestion.normalizer.dead_letter import DeadLetterQueue, get_d
 from app.services.ingestion.normalizer.engagement import compute_engagement_rate
 from app.services.ingestion.normalizer.language_detection import detect_language
 from app.services.ingestion.normalizer.parsers import PLATFORM_PARSERS, MalformedPostError
-from app.services.ingestion.normalizer.post_schema import Platform, RawPost
+from app.services.ingestion.normalizer.post_schema import MediaType, Platform, RawPost
 
 
 @dataclass
@@ -17,10 +17,11 @@ class NormalizationSummary:
     received: int
     malformed: int
     added_to_pool: int
+    filtered_media: int = 0  # dropped by the media-type filter (e.g. videos)
 
     @property
     def duplicates(self) -> int:
-        return self.received - self.malformed - self.added_to_pool
+        return self.received - self.malformed - self.filtered_media - self.added_to_pool
 
 
 async def normalize_and_ingest(
@@ -29,6 +30,7 @@ async def normalize_and_ingest(
     source_query: str,
     pool: DataPool | None = None,
     dead_letters: DeadLetterQueue | None = None,
+    allowed_media_types: set[MediaType] | None = None,
 ) -> NormalizationSummary:
     """The Data Normalizer pipeline: parse -> detect language -> score engagement
     -> dedupe into the Data Pool (architecture doc 2.4).
@@ -36,6 +38,9 @@ async def normalize_and_ingest(
     Malformed records are routed to the Dead Letter Queue instead of aborting
     the whole batch. The Data Pool itself only ever sees valid, fully
     normalized `RawPost`s.
+
+    `allowed_media_types` (e.g. {"image", "carousel"}) filters out other media
+    before ingestion — used to pull static posts only, not videos.
     """
     pool = pool or get_data_pool()
     dead_letters = dead_letters or get_dead_letter_queue()
@@ -44,6 +49,7 @@ async def normalize_and_ingest(
     raw_list = list(raw_records)
     parsed: list[RawPost] = []
     malformed_count = 0
+    filtered_count = 0
 
     for raw in raw_list:
         try:
@@ -53,6 +59,10 @@ async def normalize_and_ingest(
             malformed_count += 1
             continue
 
+        if allowed_media_types is not None and post.media_type not in allowed_media_types:
+            filtered_count += 1
+            continue
+
         post.language = detect_language(post.text)
         post.engagement_rate = compute_engagement_rate(post.engagement, post.author_follower_count)
         parsed.append(post)
@@ -60,5 +70,8 @@ async def normalize_and_ingest(
     added = await pool.add_many(parsed)
 
     return NormalizationSummary(
-        received=len(raw_list), malformed=malformed_count, added_to_pool=added
+        received=len(raw_list),
+        malformed=malformed_count,
+        added_to_pool=added,
+        filtered_media=filtered_count,
     )
