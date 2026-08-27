@@ -99,7 +99,7 @@ def load_brand_kb(
     kb = kb or get_brand_kb()
     s3_client = s3_client or _build_s3_client(settings)
 
-    chunks = load_chunks_from_s3(s3_client, settings.s3_bucket_brand_kb)
+    chunks = load_chunks_from_s3(s3_client, settings.s3_bucket_raw_media)
     added = kb.add_chunks(chunks)
-    logger.info("Loaded %s brand KB chunks from s3://%s", added, settings.s3_bucket_brand_kb)
+    logger.info("Loaded %s brand KB chunks from s3://%s", added, settings.s3_bucket_raw_media)
     return added

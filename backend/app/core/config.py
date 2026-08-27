@@ -13,6 +13,8 @@ class Settings(BaseSettings):
     aws_secret_access_key: str | None = None
     aws_region: str = "us-east-1"
     s3_bucket_brand_kb: str = "brand-kb"
+    # General-purpose bucket that also holds brand KB material (upload target).
+    s3_bucket_raw_media: str = "raw-media"
     bedrock_region: str = "us-east-1"
     haiku_model_id: str = "anthropic.claude-3-5-haiku-20241022-v1:0"
     # Sonnet (via Bedrock) for caption + image-prompt generation (Modules 13-14).

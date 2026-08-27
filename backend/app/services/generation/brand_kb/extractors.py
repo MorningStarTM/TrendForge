@@ -22,17 +22,21 @@ def _extract_text(data: bytes) -> str:
 
 
 def _extract_pdf(data: bytes) -> str:
-    raise UnsupportedFormatError(
-        "PDF extraction not implemented yet — add a pypdf-based handler to "
-        "EXTRACTORS['.pdf'] in extractors.py"
-    )
+    import io
+
+    from pypdf import PdfReader
+
+    reader = PdfReader(io.BytesIO(data))
+    return "\n\n".join((page.extract_text() or "") for page in reader.pages).strip()
 
 
 def _extract_docx(data: bytes) -> str:
-    raise UnsupportedFormatError(
-        "DOCX extraction not implemented yet — add a python-docx-based handler "
-        "to EXTRACTORS['.docx'] in extractors.py"
-    )
+    import io
+
+    from docx import Document
+
+    document = Document(io.BytesIO(data))
+    return "\n".join(p.text for p in document.paragraphs if p.text).strip()
 
 
 EXTRACTORS: dict[str, Extractor] = {

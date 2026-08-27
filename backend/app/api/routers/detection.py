@@ -5,9 +5,33 @@ import asyncio
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
+from app.core.config import get_settings
 from app.services import content_generation, trend_detection
 
 router = APIRouter()
+
+
+@router.get("/system")
+def system_info() -> dict:
+    """Read-only system status for the Settings page (no secrets returned)."""
+    s = get_settings()
+    return {
+        "models": {
+            "detection": s.haiku_model_id,
+            "generation": s.sonnet_model_id,
+            "image": s.gemini_image_model,
+            "embeddings": s.embedding_model,
+        },
+        "regions": {"bedrock": s.bedrock_region, "aws": s.aws_region},
+        "brand_kb_bucket": s.s3_bucket_raw_media,
+        "credits": trend_detection.get_credit_balance(),
+        "configured": {
+            "scrapecreators": bool(s.scrapecreators_api_key),
+            "bedrock": bool(s.aws_access_key_id and s.aws_secret_access_key),
+            "gemini": bool(s.gemini_api_key),
+            "embeddings": bool(s.hf_token),
+        },
+    }
 
 
 class IngestionRequest(BaseModel):

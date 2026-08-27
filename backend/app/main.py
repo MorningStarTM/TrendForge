@@ -3,7 +3,7 @@ from __future__ import annotations
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routers import detection
+from app.api.routers import brand_kb, detection
 
 app = FastAPI(title="TrendForge — Trend Detection API")
 
@@ -17,6 +17,7 @@ app.add_middleware(
 )
 
 app.include_router(detection.router, prefix="/api")
+app.include_router(brand_kb.router, prefix="/api")
 
 
 @app.get("/health")
