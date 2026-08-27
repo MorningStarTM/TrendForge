@@ -3,7 +3,8 @@
 # The system is in-memory and single-process (no database, no Redis, no Celery),
 # so there are no postgres/redis/worker/beat containers — nothing uses them.
 #   - backend : FastAPI trend-detection API (scrape -> normalize -> rule engine)
-#   - frontend: Next.js console, proxies the detection endpoints to the backend
+#   - web     : production Next.js app (port 3000) — the main console
+#   - frontend: legacy testing UI (port 3002), kept for debugging
 #
 # Secrets come from the gitignored .env at runtime (env_file) — never baked into
 # the images. Requires SCRAPECREATORS_API_KEY, and (for the LLM stages, once
@@ -19,9 +20,10 @@ services:
     ports:
       - "8000:8000"
 
-  frontend:
+  # Production web app (frontend-prod): Discover, Trends, Brand KB, Settings.
+  web:
     build:
-      context: ./frontend
+      context: ./frontend-prod
       dockerfile: Dockerfile
     restart: unless-stopped
     environment:
@@ -34,3 +36,19 @@ services:
         condition: service_healthy
     ports:
       - "3000:3000"
+
+  # Legacy testing UI — kept for debugging. Runs on host port 3002.
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      BACKEND_URL: http://backend:8000
+      DASHBOARD_USERNAME: ${DASHBOARD_USERNAME:-admin}
+      DASHBOARD_PASSWORD: ${DASHBOARD_PASSWORD:-trendforge}
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "3002:3000"
