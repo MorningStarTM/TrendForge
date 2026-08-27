@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* HOP palette — bright yellow + black (from hop.rocks). Yellow is used as a
+   background/highlight with black text, never as text on a light surface. */
+:root {
+  --brand: #ffff46; /* HOP yellow */
+  --brand-deep: #ecec2f; /* slightly deeper yellow for hover */
+  --brand-ink: #131313; /* text that sits on yellow */
+  --dark: #131313; /* near-black surfaces (sidebar, dark buttons) */
+  --dark-2: #1f1f1f;
+  --ink: #16171a; /* primary text */
+  --muted: #6b7280;
+  --line: #e6e7ea;
+  --bg: #f6f6f3; /* warm neutral background */
+  --panel: #ffffff;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-poppins), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+@layer components {
+  .card {
+    @apply rounded-xl border border-[var(--line)] bg-[var(--panel)] shadow-sm;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-3.5 py-2 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  /* Primary CTA: yellow with black text — the signature HOP look. */
+  .btn-primary {
+    @apply btn bg-[var(--brand)] text-[var(--brand-ink)] hover:bg-[var(--brand-deep)];
+  }
+  .btn-dark {
+    @apply btn bg-[var(--dark)] text-[var(--brand)] hover:bg-[var(--dark-2)];
+  }
+  .btn-ghost {
+    @apply btn border border-[var(--line)] bg-white text-[var(--ink)] hover:bg-gray-50;
+  }
+  .btn-danger {
+    @apply btn border border-red-200 bg-white text-red-600 hover:bg-red-50;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium;
+  }
+  .input {
+    @apply w-full rounded-lg border border-[var(--line)] px-3 py-2 text-sm outline-none focus:border-[var(--dark)];
+  }
+}
