@@ -1,0 +1,170 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─────────────────────────────────────────────────────────────────────────
+   TrendForge — production design system.
+   HOP palette (hop.rocks): bright yellow #FFFF46 + near-black, Poppins.
+   Yellow is a highlight/CTA surface with black text — never text on white.
+   ───────────────────────────────────────────────────────────────────────── */
+:root {
+  --brand: #ffff46;
+  --brand-deep: #ecec2f;
+  --brand-ink: #131313;
+  --dark: #131313;
+  --dark-2: #1f1f20;
+  --dark-3: #2a2a2c;
+  --ink: #16171a;
+  --muted: #6b7280;
+  --faint: #9ca3af;
+  --line: #e7e8ec;
+  --line-2: #eff0f3;
+  --bg: #f7f7f4;
+  --panel: #ffffff;
+  --panel-2: #fbfbf9;
+  --ring: rgba(19, 19, 19, 0.12);
+  --shadow-sm: 0 1px 2px rgba(16, 17, 26, 0.04), 0 1px 3px rgba(16, 17, 26, 0.06);
+  --shadow-md: 0 4px 12px rgba(16, 17, 26, 0.06), 0 2px 4px rgba(16, 17, 26, 0.04);
+  --shadow-lg: 0 12px 32px rgba(16, 17, 26, 0.1);
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-poppins), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+::selection {
+  background: var(--brand);
+  color: var(--brand-ink);
+}
+
+/* Slim, unobtrusive scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #d6d7db transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background: #d6d7db;
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+@layer components {
+  .card {
+    @apply rounded-2xl border border-[var(--line)] bg-[var(--panel)];
+    box-shadow: var(--shadow-sm);
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-50;
+    outline: none;
+  }
+  .btn:focus-visible {
+    box-shadow: 0 0 0 3px var(--ring);
+  }
+  .btn-primary {
+    @apply btn bg-[var(--brand)] text-[var(--brand-ink)] hover:bg-[var(--brand-deep)] active:scale-[0.98];
+    box-shadow: var(--shadow-sm);
+  }
+  .btn-dark {
+    @apply btn bg-[var(--dark)] text-white hover:bg-[var(--dark-2)] active:scale-[0.98];
+  }
+  .btn-ghost {
+    @apply btn border border-[var(--line)] bg-white text-[var(--ink)] hover:border-[var(--faint)] hover:bg-[var(--panel-2)];
+  }
+  .btn-danger {
+    @apply btn border border-red-200 bg-white text-red-600 hover:bg-red-50;
+  }
+  .btn-sm {
+    @apply rounded-lg px-3 py-1.5 text-xs;
+  }
+
+  .input {
+    @apply w-full rounded-xl border border-[var(--line)] bg-white px-3.5 py-2.5 text-sm text-[var(--ink)] outline-none transition-colors placeholder:text-[var(--faint)];
+  }
+  .input:focus {
+    @apply border-[var(--dark)];
+    box-shadow: 0 0 0 3px var(--ring);
+  }
+  .label {
+    @apply mb-1.5 block text-xs font-semibold uppercase tracking-wide text-[var(--muted)];
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium;
+  }
+  .chip-brand {
+    @apply chip bg-[#fbfbcf] text-[#5c5c00];
+  }
+  .chip-neutral {
+    @apply chip bg-gray-100 text-gray-700;
+  }
+  .chip-green {
+    @apply chip bg-emerald-50 text-emerald-700;
+  }
+  .chip-amber {
+    @apply chip bg-amber-50 text-amber-700;
+  }
+  .chip-red {
+    @apply chip bg-red-50 text-red-700;
+  }
+  .chip-blue {
+    @apply chip bg-sky-50 text-sky-700;
+  }
+
+  /* Section eyebrow label */
+  .eyebrow {
+    @apply text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)];
+  }
+}
+
+/* Loading skeleton shimmer */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: #ececec;
+}
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+  animation: shimmer 1.4s infinite;
+}
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.spinner {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid rgba(0, 0, 0, 0.15);
+  border-top-color: var(--dark);
+  border-radius: 999px;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
